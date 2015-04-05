@@ -87,7 +87,14 @@ private slots:
 
     void on_patternResized();
 
+    void on_actionNew_Animation_triggered();
+
+    void on_actionOpen_Animation_triggered();
+
+    void on_actionClose_animation_triggered();
+
 private:
+    static int anim_counter;
     ColorChooser* m_colorChooser;
 
     QTimer* drawTimer;

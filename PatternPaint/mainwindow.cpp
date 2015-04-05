@@ -644,3 +644,25 @@ bool MainWindow::saveFile(const QString& filename) {
     m_lastFile = filename;
     return true;
 }
+
+int MainWindow::anim_counter = 0;
+
+void MainWindow::on_actionNew_Animation_triggered()
+{
+    animList->setIconSize(QSize(200,120));
+    QPixmap pm(200, 120);
+    pm.fill(QColor(0,0,0));
+    QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(++anim_counter));
+    p->setTextAlignment(Qt::AlignLeft);
+    animList->addItem(p);
+}
+
+void MainWindow::on_actionOpen_Animation_triggered()
+{
+
+}
+
+void MainWindow::on_actionClose_animation_triggered()
+{
+
+}

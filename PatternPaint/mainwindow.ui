@@ -80,6 +80,16 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <item>
+        <widget class="QListWidget" name="animList">
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="viewMode">
+          <enum>QListView::IconMode</enum>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -217,6 +227,10 @@
     <addaction name="actionSave_File"/>
     <addaction name="actionSave_File_as"/>
     <addaction name="separator"/>
+    <addaction name="actionNew_Animation"/>
+    <addaction name="actionOpen_Animation"/>
+    <addaction name="actionClose_animation"/>
+    <addaction name="separator"/>
     <addaction name="actionExport_pattern_for_Arduino"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -291,7 +305,7 @@
     <string>toolBar</string>
    </property>
    <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
+    <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
@@ -530,6 +544,21 @@
    </property>
    <property name="shortcut">
     <string>, Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionNew_Animation">
+   <property name="text">
+    <string>New Animation</string>
+   </property>
+  </action>
+  <action name="actionOpen_Animation">
+   <property name="text">
+    <string>Open Animation</string>
+   </property>
+  </action>
+  <action name="actionClose_animation">
+   <property name="text">
+    <string>Close animation</string>
    </property>
   </action>
  </widget>
