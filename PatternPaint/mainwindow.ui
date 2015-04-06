@@ -82,11 +82,11 @@
        </property>
        <item>
         <widget class="QListWidget" name="animList">
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
+         <property name="textElideMode">
+          <enum>Qt::ElideRight</enum>
          </property>
-         <property name="viewMode">
-          <enum>QListView::IconMode</enum>
+         <property name="resizeMode">
+          <enum>QListView::Adjust</enum>
          </property>
         </widget>
        </item>

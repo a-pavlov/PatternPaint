@@ -155,6 +155,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     patternEditor->setToolColor(QColor(255,255,255));
     actionPen->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
+    animList->setDragDropMode(QAbstractItemView::InternalMove);
+
     readSettings();
 }
 
@@ -650,11 +652,12 @@ int MainWindow::anim_counter = 0;
 void MainWindow::on_actionNew_Animation_triggered()
 {
     animList->setIconSize(QSize(200,120));
-    QPixmap pm(200, 120);
-    pm.fill(QColor(0,0,0));
-    QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(++anim_counter));
+    QPixmap pm(210, 120);
+    pm.fill(QColor(anim_counter*10,anim_counter*50,anim_counter*30));
+    QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(++anim_counter) );
     p->setTextAlignment(Qt::AlignLeft);
     animList->addItem(p);
+    animList->setDragDropMode(QAbstractItemView::InternalMove);
 }
 
 void MainWindow::on_actionOpen_Animation_triggered()
