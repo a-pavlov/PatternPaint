@@ -85,6 +85,9 @@
          <property name="textElideMode">
           <enum>Qt::ElideRight</enum>
          </property>
+         <property name="movement">
+          <enum>QListView::Free</enum>
+         </property>
          <property name="resizeMode">
           <enum>QListView::Adjust</enum>
          </property>
@@ -94,7 +97,14 @@
      </widget>
     </item>
     <item>
-     <widget class="QStackedWidget" name="editors"/>
+     <widget class="QStackedWidget" name="editors">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout">

@@ -7,6 +7,9 @@ class QUndoStack;
 class UndoCommand;
 class AbstractInstrument;
 
+#define DEFAULT_PATTERN_HEIGHT 60
+#define DEFAULT_PATTERN_LENGTH 100
+
 class PatternEditor : public QWidget
 {
     Q_OBJECT
@@ -55,6 +58,7 @@ public:
     void pushUndoCommand(UndoCommand *command);
     bool isPaint() const { return m_isPaint; }
     void setPaint(bool paint) { m_isPaint = paint; }
+    AbstractInstrument* instrument() { return m_pi; }
 protected:
     void paintEvent(QPaintEvent *event);
 

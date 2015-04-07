@@ -4,6 +4,8 @@
 #include <QScrollArea>
 #include "ui_letterscrollarea.h"
 
+class AbstractInstrument;
+
 class LetterScrollArea : public QScrollArea, public Ui::LetterScrollArea
 {
     Q_OBJECT
@@ -11,7 +13,8 @@ class LetterScrollArea : public QScrollArea, public Ui::LetterScrollArea
 public:
     explicit LetterScrollArea(QWidget *parent = 0);
     ~LetterScrollArea();
-
+    void setInstrument(AbstractInstrument*);
+    AbstractInstrument* instrument();
 protected:
     void resizeEvent(QResizeEvent *event);
 };

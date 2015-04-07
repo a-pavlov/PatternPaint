@@ -27,9 +27,6 @@
 // TODO: Move this to pattern uploader or something?
 #include "ColorSwirl_Sketch.h"
 
-#define DEFAULT_PATTERN_HEIGHT 60
-#define DEFAULT_PATTERN_LENGTH 100
-
 #define MIN_TIMER_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
 
 #define CONNECTION_SCANNER_INTERVAL 100
@@ -157,32 +154,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     animList->setDragDropMode(QAbstractItemView::InternalMove);
     animList->setIconSize(QSize(200,120));
+    addNewAnimation(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
+    /*
     QPixmap pm(210, 120);
     pm.fill(QColor(anim_counter*10,anim_counter*50,anim_counter*30));
 
     LetterScrollArea* lsa = new LetterScrollArea(this);
-
-    //LetterboxScrollArea* lba = new LetterboxScrollArea(this);
-    //lba->setFrameShape(QFrame::NoFrame);
-    //lba->setLineWidth(0);
-    //lba->setWidgetResizable(true);
-    //PatternEditor* pe = new PatternEditor(lba);
-    //pe->setGeometry(QRect(0, 0, 500, 371));
-    //QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    //sizePolicy1.setHeightForWidth(pe->sizePolicy().hasHeightForWidth());
-    //sizePolicy1.setHorizontalStretch(0);
-    //sizePolicy1.setVerticalStretch(0);
-    //sizePolicy1.setHeightForWidth(patternToolbox->sizePolicy().hasHeightForWidth());
-    //pe->setSizePolicy(sizePolicy1);
-    //pe->setMinimumSize(QSize(500, 0));
-    //pe->setMaximumSize(QSize(500, 16777215));
-    //pe->setBaseSize(QSize(10, 10));
-    lsa->patternEditor->setToolSize(1);
-    lsa->patternEditor->setToolColor(QColor(255,255,255));
-    lsa->patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
     lsa->patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
-    //lsa->patternEditor->setPalette(QPalette(QColor(0,0,0)));
-    //lba->setWidget(pe);
     editors->addWidget(lsa);
     QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(++anim_counter) );
     p->setTextAlignment(Qt::AlignLeft);
@@ -190,6 +168,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     animList->addItem(p);
     animList->selectAll();
     editors->setCurrentIndex(0);
+    */
     readSettings();
 }
 
@@ -684,13 +663,18 @@ int MainWindow::anim_counter = 0;
 
 void MainWindow::on_actionNew_Animation_triggered()
 {
-    animList->setIconSize(QSize(200,120));
-    QPixmap pm(210, 120);
-    pm.fill(QColor(anim_counter*10,anim_counter*50,anim_counter*30));
-    QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(++anim_counter) );
-    p->setTextAlignment(Qt::AlignLeft);
-    animList->addItem(p);
-    animList->setDragDropMode(QAbstractItemView::InternalMove);
+    // TODO: Dispose of this?
+    ResizePattern* resizer = new ResizePattern(this);
+    resizer->setWindowModality(Qt::WindowModal);
+    resizer->setLength(100);
+    resizer->setLedCount(60);
+    resizer->exec();
+
+    if(resizer->result() != QDialog::Accepted) {
+        return;
+    }
+
+    addNewAnimation(resizer->length(), resizer->ledCount());
 }
 
 void MainWindow::on_actionOpen_Animation_triggered()
@@ -709,4 +693,30 @@ PatternEditor* MainWindow::getPatternEditor() {
     PatternEditor* p = qvariant_cast<PatternEditor*>(items[0]->data(Qt::UserRole));
     Q_ASSERT(p);
     return p;
+}
+
+AbstractInstrument* MainWindow::currentInstrument() const {
+    AbstractInstrument* p = NULL;
+    foreach(QAction* a, instruments->actions()) {
+        if (a->isChecked()) {
+            p = qvariant_cast<AbstractInstrument*>(a->data());
+            break;
+        }
+    }
+
+    Q_ASSERT(p != NULL);
+    return p;
+}
+
+void MainWindow::addNewAnimation(int width, int height) {
+    Q_ASSERT(width > 0);
+    Q_ASSERT(height > 0);
+    QPixmap pm(QSize(width, height));
+    pm.fill(QColor(anim_counter*10,anim_counter*50,anim_counter*30));
+    QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(editors->count()));
+    p->setTextAlignment(Qt::AlignLeft);
+    animList->addItem(p);
+    LetterScrollArea* lsa = new LetterScrollArea();
+    lsa->setInstrument(currentInstrument());
+    editors->addWidget(lsa);
 }

@@ -122,6 +122,20 @@ private:
     int warnUnsavedData();
     bool saveFile(const QString& filename);
     PatternEditor* getPatternEditor();
+
+    /**
+     * @brief currentInstrument - get current instrument by enumeration all actions in instruments toolbar
+     * @return AbstractInsrument attached to checked action in instruments toolbar
+     */
+    AbstractInstrument* currentInstrument() const;
+
+    /**
+     * @brief addNewAnimation - add new item into list widget with animation icon and add new pattern editor into
+     * stacked widget for editing
+     * @param width - frames count in animation
+     * @param height - leds count in animation
+     */
+    void addNewAnimation(int width, int height);
 };
 
 #endif // MAINWINDOW_H
