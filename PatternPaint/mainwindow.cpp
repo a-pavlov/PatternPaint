@@ -711,12 +711,14 @@ AbstractInstrument* MainWindow::currentInstrument() const {
 void MainWindow::addNewAnimation(int width, int height) {
     Q_ASSERT(width > 0);
     Q_ASSERT(height > 0);
-    QPixmap pm(QSize(width, height));
-    pm.fill(QColor(anim_counter*10,anim_counter*50,anim_counter*30));
+
+    LetterScrollArea* lsa = new LetterScrollArea();
+    QPixmap pm;
+    Q_ASSERT(pm.convertFromImage(lsa->patternEditor->getPatternAsImage().scaledToHeight(60)));
     QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(editors->count()));
     p->setTextAlignment(Qt::AlignLeft);
     animList->addItem(p);
-    LetterScrollArea* lsa = new LetterScrollArea();
+    lsa->patternEditor->getPatternAsImage();
     lsa->setInstrument(currentInstrument());
     editors->addWidget(lsa);
 }

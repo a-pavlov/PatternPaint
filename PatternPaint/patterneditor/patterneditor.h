@@ -88,6 +88,7 @@ private:
 signals:
     void changed(bool);
     void resized();
+    void updated(const QImage&);
 public slots:
     void setToolColor(QColor color);
     void setToolSize(int size);

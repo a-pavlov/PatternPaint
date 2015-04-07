@@ -245,6 +245,7 @@ void PatternEditor::lazyUpdate() {
     lastTime = newTime;
 
     update();
+    emit updated(pattern);
 }
 
 void PatternEditor::paintEvent(QPaintEvent*)
