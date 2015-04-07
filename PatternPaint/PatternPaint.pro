@@ -47,7 +47,6 @@ SOURCES += main.cpp\
     colormodel.cpp \
     aboutpatternpaint.cpp \
     pattern.cpp \
-    patterneditor.cpp \
     resizepattern.cpp \
     addressprogrammer.cpp \
     avrpatternuploader.cpp \
@@ -55,8 +54,6 @@ SOURCES += main.cpp\
     lightbuddypatternuploader.cpp \
     serialcommandqueue.cpp \
     lightbuddyprotocol.cpp \
-    letterboxscrollarea.cpp \
-    undocommand.cpp \
     colorchooser.cpp
 
 HEADERS  += mainwindow.h \
@@ -69,7 +66,6 @@ HEADERS  += mainwindow.h \
     colormodel.h \
     aboutpatternpaint.h \
     pattern.h \
-    patterneditor.h \
     resizepattern.h \
     addressprogrammer.h \
     avrpatternuploader.h \
@@ -78,8 +74,6 @@ HEADERS  += mainwindow.h \
     lightbuddypatternuploader.h \
     serialcommandqueue.h \
     lightbuddyprotocol.h \
-    letterboxscrollarea.h \
-    undocommand.h \
     colorchooser.h
 
 FORMS    += mainwindow.ui \
@@ -89,6 +83,7 @@ FORMS    += mainwindow.ui \
     addressprogrammer.ui
 
 include(instruments/instruments.pri)
+include(patterneditor/patterneditor.pri)
 
 # OS X: Specify icon resource to use
 ICON = images/blinkytape.icns

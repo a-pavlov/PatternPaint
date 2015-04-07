@@ -94,6 +94,9 @@
      </widget>
     </item>
     <item>
+     <widget class="QStackedWidget" name="editors"/>
+    </item>
+    <item>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="LetterboxScrollArea" name="scrollArea">
@@ -176,7 +179,7 @@
            <x>0</x>
            <y>0</y>
            <width>500</width>
-           <height>387</height>
+           <height>371</height>
           </rect>
          </property>
          <property name="sizePolicy">

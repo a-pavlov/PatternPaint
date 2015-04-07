@@ -7,6 +7,7 @@
 #include "resizepattern.h"
 #include "undocommand.h"
 #include "colorchooser.h"
+#include "letterscrollarea.h"
 
 
 #include "pencilinstrument.h"
@@ -36,7 +37,6 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     setupUi(this);
-
 
     // prepare undo/redo
     menuEdit->addSeparator();
@@ -156,7 +156,40 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionPen->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     animList->setDragDropMode(QAbstractItemView::InternalMove);
+    animList->setIconSize(QSize(200,120));
+    QPixmap pm(210, 120);
+    pm.fill(QColor(anim_counter*10,anim_counter*50,anim_counter*30));
 
+    LetterScrollArea* lsa = new LetterScrollArea(this);
+
+    //LetterboxScrollArea* lba = new LetterboxScrollArea(this);
+    //lba->setFrameShape(QFrame::NoFrame);
+    //lba->setLineWidth(0);
+    //lba->setWidgetResizable(true);
+    //PatternEditor* pe = new PatternEditor(lba);
+    //pe->setGeometry(QRect(0, 0, 500, 371));
+    //QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    //sizePolicy1.setHeightForWidth(pe->sizePolicy().hasHeightForWidth());
+    //sizePolicy1.setHorizontalStretch(0);
+    //sizePolicy1.setVerticalStretch(0);
+    //sizePolicy1.setHeightForWidth(patternToolbox->sizePolicy().hasHeightForWidth());
+    //pe->setSizePolicy(sizePolicy1);
+    //pe->setMinimumSize(QSize(500, 0));
+    //pe->setMaximumSize(QSize(500, 16777215));
+    //pe->setBaseSize(QSize(10, 10));
+    lsa->patternEditor->setToolSize(1);
+    lsa->patternEditor->setToolColor(QColor(255,255,255));
+    lsa->patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
+    lsa->patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
+    //lsa->patternEditor->setPalette(QPalette(QColor(0,0,0)));
+    //lba->setWidget(pe);
+    editors->addWidget(lsa);
+    QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(++anim_counter) );
+    p->setTextAlignment(Qt::AlignLeft);
+    p->setData(Qt::UserRole, QVariant::fromValue(NULL));
+    animList->addItem(p);
+    animList->selectAll();
+    editors->setCurrentIndex(0);
     readSettings();
 }
 
@@ -668,4 +701,12 @@ void MainWindow::on_actionOpen_Animation_triggered()
 void MainWindow::on_actionClose_animation_triggered()
 {
 
+}
+
+PatternEditor* MainWindow::getPatternEditor() {
+    QList<QListWidgetItem*> items = animList->selectedItems();
+    Q_ASSERT(items.size() == 1);
+    PatternEditor* p = qvariant_cast<PatternEditor*>(items[0]->data(Qt::UserRole));
+    Q_ASSERT(p);
+    return p;
 }

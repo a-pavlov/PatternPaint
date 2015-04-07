@@ -121,6 +121,7 @@ private:
     void readSettings();
     int warnUnsavedData();
     bool saveFile(const QString& filename);
+    PatternEditor* getPatternEditor();
 };
 
 #endif // MAINWINDOW_H
