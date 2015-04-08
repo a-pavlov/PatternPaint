@@ -23,6 +23,7 @@ public:
 private:
     QUndoStack  ustack;
     QImage img;
+    bool modified;
 signals:
 
 public slots:

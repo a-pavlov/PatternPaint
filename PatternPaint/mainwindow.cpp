@@ -627,6 +627,9 @@ void MainWindow::on_colorPicked(QColor color) {
 
 void MainWindow::on_patternChanged(bool changed) {
     qDebug() << Q_FUNC_INFO;
+    SlideShowItem* p = dynamic_cast<SlideShowItem*>(animList->currentItem());
+    Q_ASSERT(p);
+    p->setData(SlideShowItem::Modified, changed);
 }
 
 void MainWindow::on_patternUpdated() {

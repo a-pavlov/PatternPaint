@@ -12,6 +12,7 @@
         <file>images/disconnect.png</file>
         <file>images/redo.png</file>
         <file>images/undo.png</file>
+        <file>images/modified.png</file>
     </qresource>
     <qresource prefix="/instruments">
         <file>images/instruments-icons/cursor.png</file>

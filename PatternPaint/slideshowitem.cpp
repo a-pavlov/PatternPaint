@@ -15,8 +15,16 @@ QVariant SlideShowItem::data(int role) const {
 }
 
 void SlideShowItem::setData(int role, const QVariant& value) {
-    if (role == PreviewImage) {
+    switch(role)
+    {
+    case PreviewImage:
         img = qvariant_cast<QImage>(value);
+        break;
+    case Modified:
+        modified = qvariant_cast<bool>(value);
+        break;
+    default:
+        break;
     }
 
     QListWidgetItem::setData(role, value);
