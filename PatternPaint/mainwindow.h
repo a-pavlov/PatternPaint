@@ -141,7 +141,6 @@ private:
     void readSettings();
     int warnUnsavedData();
     bool saveFile(const QString& filename);
-    PatternEditor* getPatternEditor();
 
     /**
      * @brief currentInstrument - get current instrument by enumeration all actions in instruments toolbar

@@ -680,15 +680,14 @@ void MainWindow::on_actionOpen_Animation_triggered()
 
 void MainWindow::on_actionClose_animation_triggered()
 {
-
-}
-
-PatternEditor* MainWindow::getPatternEditor() {
-    QList<QListWidgetItem*> items = animList->selectedItems();
-    Q_ASSERT(items.size() == 1);
-    PatternEditor* p = qvariant_cast<PatternEditor*>(items[0]->data(Qt::UserRole));
-    Q_ASSERT(p);
-    return p;
+    qDebug() << Q_FUNC_INFO;
+    Q_ASSERT(animList->count() > 1);
+    SlideShowItem* p = dynamic_cast<SlideShowItem*>(animList->currentItem());
+    Q_ASSERT(p != NULL);
+    m_undoStackGroup->removeStack(p->stack());
+    patternEditor->setUndoStack(NULL);
+    delete p;
+    actionClose_animation->setEnabled(animList->count() > 1);
 }
 
 AbstractInstrument* MainWindow::currentInstrument() const {
@@ -714,6 +713,7 @@ void MainWindow::addNewAnimation(int width, int height) {
     m_undoStackGroup->addStack(p->stack());
     animList->addItem(p);
     animList->setCurrentItem(p);
+    actionClose_animation->setEnabled(animList->count() > 1);
 }
 
 void MainWindow::on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
