@@ -66,6 +66,7 @@ public:
     inline int stripLength() const { return pattern.height(); }
 
     AbstractInstrument* instrument() { return m_pi; }
+    void update();
 protected:
     void paintEvent(QPaintEvent *event);
 

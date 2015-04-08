@@ -247,9 +247,7 @@ void PatternEditor::lazyUpdate() {
     }
 
     lastTime = newTime;
-
     update();
-    emit updated();
 }
 
 void PatternEditor::paintEvent(QPaintEvent*)
@@ -284,4 +282,9 @@ void PatternEditor::pushUndoCommand(UndoCommand *command)
     Q_ASSERT(m_undoStack != NULL);
     if (command) m_undoStack->push(command);
     setEdited(true);
+}
+
+void PatternEditor::update() {
+    QWidget::update();
+    emit updated();
 }
