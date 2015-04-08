@@ -32,6 +32,7 @@ public:
     void setImage(const QImage& img) { pattern = img; }
 
     inline QUndoStack* getUndoStack() { return m_undoStack; }
+    inline void setUndoStack(QUndoStack* stack) { m_undoStack = stack; }
 
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern

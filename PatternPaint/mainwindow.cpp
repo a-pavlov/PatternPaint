@@ -29,6 +29,11 @@
 // TODO: Move this to pattern uploader or something?
 #include "ColorSwirl_Sketch.h"
 
+enum SlideShowRoles {
+    ImageRole       = Qt::UserRole + 1,
+    UndoStackRole   = Qt::UserRole + 2
+};
+
 #define MIN_TIMER_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
 
 #define CONNECTION_SCANNER_INTERVAL 100
@@ -50,9 +55,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     m_redoAction->setEnabled(false);
     m_redoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Y")));
     menuEdit->addAction(m_redoAction);
-
-    m_undoStackGroup->addStack(patternEditor->getUndoStack());
-    m_undoStackGroup->setActiveStack(patternEditor->getUndoStack());
 
     // instruments
     ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
@@ -157,23 +159,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionPen->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     animList->setDragDropMode(QAbstractItemView::InternalMove);
-    //animList->setIconSize(QSize(200,120));
     animList->setItemDelegate(new PatternEditorDelegate());
     addNewAnimation(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
-    /*
-    QPixmap pm(210, 120);
-    pm.fill(QColor(anim_counter*10,anim_counter*50,anim_counter*30));
-
-    LetterScrollArea* lsa = new LetterScrollArea(this);
-    lsa->patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
-    editors->addWidget(lsa);
-    QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(++anim_counter) );
-    p->setTextAlignment(Qt::AlignLeft);
-    p->setData(Qt::UserRole, QVariant::fromValue(NULL));
-    animList->addItem(p);
-    animList->selectAll();
-    editors->setCurrentIndex(0);
-    */
     readSettings();
 }
 
@@ -639,8 +626,6 @@ void MainWindow::on_colorPicked(QColor color) {
 
 void MainWindow::on_patternChanged(bool changed) {
     qDebug() << Q_FUNC_INFO;
-    Q_UNUSED(changed);
-    animList->currentItem()->setData(Qt::UserRole, patternEditor->getPatternAsImage());
 }
 
 void MainWindow::on_patternUpdated() {
@@ -722,20 +707,22 @@ AbstractInstrument* MainWindow::currentInstrument() const {
 void MainWindow::addNewAnimation(int width, int height) {
     Q_ASSERT(width > 0);
     Q_ASSERT(height > 0);
-
-    //LetterScrollArea* lsa = new LetterScrollArea();
-    //QPixmap pm;
-    //Q_ASSERT(pm.convertFromImage(lsa->patternEditor->getPatternAsImage().scaledToHeight(60)));
     QImage pattern(width, height, QImage::Format_ARGB32_Premultiplied);
     pattern.fill(QColor(0,0,0));
-    QListWidgetItem* p = new QListWidgetItem(QString::number(0));
+    SlideShowItem* p = new SlideShowItem(QString::number(0));
     p->setData(Qt::UserRole, QVariant::fromValue<QImage>(pattern));
+    m_undoStackGroup->addStack(p->stack());
     animList->addItem(p);
     animList->setCurrentItem(p);
 }
 
 void MainWindow::on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
 {
+    qDebug() << Q_FUNC_INFO;
     Q_UNUSED(previous);
-    patternEditor->init(qvariant_cast<QImage>(current->data(Qt::UserRole)));
+    SlideShowItem* p = dynamic_cast<SlideShowItem*>(current);
+    Q_ASSERT(p != NULL);
+    patternEditor->init(qvariant_cast<QImage>(current->data(Qt::UserRole)), false);
+    patternEditor->setUndoStack(p->stack());
+    m_undoStackGroup->setActiveStack(p->stack());
 }

@@ -25,8 +25,7 @@
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
-    m_undoStack = new QUndoStack(this);
-    m_undoStack->setUndoLimit(40);  // TODO?
+    m_undoStack = NULL;
     m_isPaint = false;
     m_pi = NULL;
     m_edited = false;
@@ -282,6 +281,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
 
 void PatternEditor::pushUndoCommand(UndoCommand *command)
 {
+    Q_ASSERT(m_undoStack != NULL);
     if (command) m_undoStack->push(command);
     setEdited(true);
 }
