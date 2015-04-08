@@ -13,26 +13,11 @@
 
 #include "ui_mainwindow.h"
 
-#include <QListWidgetItem>
-#include <QListWidget>
-#include <QUndoStack>
 
 class QUndoGroup;
 class ColorChooser;
 class QToolButton;
 class QSpinBox;
-
-
-class SlideShowItem : public QListWidgetItem {
-public:
-    SlideShowItem(QListWidget* parent = 0) : QListWidgetItem(parent, QListWidgetItem::UserType + 1) {
-        ustack.setUndoLimit(50);
-    }
-    SlideShowItem(const QString& text) : QListWidgetItem(text, 0, QListWidgetItem::UserType + 1) {}
-    QUndoStack* stack() { return &ustack; }
-private:
-    QUndoStack  ustack;
-};
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {

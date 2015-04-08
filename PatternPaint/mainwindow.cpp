@@ -9,6 +9,7 @@
 #include "colorchooser.h"
 #include "letterscrollarea.h"
 #include "patterneditordelegate.h"
+#include "slideshowitem.h"
 
 
 #include "pencilinstrument.h"
@@ -29,10 +30,10 @@
 // TODO: Move this to pattern uploader or something?
 #include "ColorSwirl_Sketch.h"
 
-enum SlideShowRoles {
-    ImageRole       = Qt::UserRole + 1,
-    UndoStackRole   = Qt::UserRole + 2
-};
+//enum SlideShowRoles {
+//    ImageRole       = Qt::UserRole + 1,
+//    UndoStackRole   = Qt::UserRole + 2
+//};
 
 #define MIN_TIMER_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
 
@@ -629,7 +630,10 @@ void MainWindow::on_patternChanged(bool changed) {
 }
 
 void MainWindow::on_patternUpdated() {
-    animList->currentItem()->setData(Qt::UserRole, patternEditor->getPatternAsImage());
+    SlideShowItem* p = dynamic_cast<SlideShowItem*>(animList->currentItem());
+    Q_ASSERT(p);
+    //p->setImage(patternEditor->getPatternAsImage());
+    animList->currentItem()->setData(SlideShowItem::PreviewImage, patternEditor->getPatternAsImage());
 }
 
 void MainWindow::on_patternResized() {
@@ -709,7 +713,8 @@ void MainWindow::addNewAnimation(int width, int height) {
     QImage pattern(width, height, QImage::Format_ARGB32_Premultiplied);
     pattern.fill(QColor(0,0,0));
     SlideShowItem* p = new SlideShowItem(QString::number(0));
-    p->setData(Qt::UserRole, QVariant::fromValue<QImage>(pattern));
+    //p->setData(Qt::UserRole, QVariant::fromValue<QImage>(pattern));
+    p->setImage(pattern);
     m_undoStackGroup->addStack(p->stack());
     animList->addItem(p);
     animList->setCurrentItem(p);
@@ -722,7 +727,8 @@ void MainWindow::on_animList_currentItemChanged(QListWidgetItem *current, QListW
     Q_UNUSED(previous);
     SlideShowItem* p = dynamic_cast<SlideShowItem*>(current);
     Q_ASSERT(p != NULL);
-    patternEditor->init(qvariant_cast<QImage>(current->data(Qt::UserRole)), false);
+    //patternEditor->init(qvariant_cast<QImage>(current->data(Qt::UserRole)), false);
+    patternEditor->init(p->getImage(), false);
     patternEditor->setUndoStack(p->stack());
     m_undoStackGroup->setActiveStack(p->stack());
 }
