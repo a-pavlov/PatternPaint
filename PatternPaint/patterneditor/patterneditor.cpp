@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QUndoStack>
 
+
 #define COLOR_CLEAR             QColor(0,0,0,0)
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
 #define COLOR_GRID_LINES        QColor(30,30,30,200)
@@ -29,6 +30,10 @@ PatternEditor::PatternEditor(QWidget *parent) :
     m_isPaint = false;
     m_pi = NULL;
     m_edited = false;
+}
+
+PatternEditor::~PatternEditor() {
+    qDebug() << Q_FUNC_INFO;
 }
 
 void PatternEditor::resizeEvent(QResizeEvent * event)
@@ -245,7 +250,7 @@ void PatternEditor::lazyUpdate() {
     lastTime = newTime;
 
     update();
-    emit updated(pattern);
+    emit updated();
 }
 
 void PatternEditor::paintEvent(QPaintEvent*)

@@ -8,6 +8,7 @@
 #include "undocommand.h"
 #include "colorchooser.h"
 #include "letterscrollarea.h"
+#include "patterneditordelegate.h"
 
 
 #include "pencilinstrument.h"
@@ -23,6 +24,7 @@
 #include <QtWidgets>
 #include <QUndoGroup>
 #include <QToolButton>
+#include <QMetaType>
 
 // TODO: Move this to pattern uploader or something?
 #include "ColorSwirl_Sketch.h"
@@ -35,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     setupUi(this);
 
+    qRegisterMetaType<QImage>("img");
     // prepare undo/redo
     menuEdit->addSeparator();
     m_undoStackGroup = new QUndoGroup(this);
@@ -101,6 +104,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(m_colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
     connect(patternEditor, SIGNAL(changed(bool)), SLOT(on_patternChanged(bool)));
+    connect(patternEditor, SIGNAL(updated()), SLOT(on_patternUpdated()));
     connect(patternEditor, SIGNAL(resized()), SLOT(on_patternResized()));
 
     tape = new BlinkyTape(this);
@@ -153,7 +157,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionPen->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     animList->setDragDropMode(QAbstractItemView::InternalMove);
-    animList->setIconSize(QSize(200,120));
+    //animList->setIconSize(QSize(200,120));
+    animList->setItemDelegate(new PatternEditorDelegate());
     addNewAnimation(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
     /*
     QPixmap pm(210, 120);
@@ -633,7 +638,13 @@ void MainWindow::on_colorPicked(QColor color) {
 }
 
 void MainWindow::on_patternChanged(bool changed) {
+    qDebug() << Q_FUNC_INFO;
     Q_UNUSED(changed);
+    animList->currentItem()->setData(Qt::UserRole, patternEditor->getPatternAsImage());
+}
+
+void MainWindow::on_patternUpdated() {
+    animList->currentItem()->setData(Qt::UserRole, patternEditor->getPatternAsImage());
 }
 
 void MainWindow::on_patternResized() {
@@ -712,13 +723,19 @@ void MainWindow::addNewAnimation(int width, int height) {
     Q_ASSERT(width > 0);
     Q_ASSERT(height > 0);
 
-    LetterScrollArea* lsa = new LetterScrollArea();
-    QPixmap pm;
-    Q_ASSERT(pm.convertFromImage(lsa->patternEditor->getPatternAsImage().scaledToHeight(60)));
-    QListWidgetItem* p = new QListWidgetItem(QIcon(pm), QString::number(editors->count()));
-    p->setTextAlignment(Qt::AlignLeft);
+    //LetterScrollArea* lsa = new LetterScrollArea();
+    //QPixmap pm;
+    //Q_ASSERT(pm.convertFromImage(lsa->patternEditor->getPatternAsImage().scaledToHeight(60)));
+    QImage pattern(width, height, QImage::Format_ARGB32_Premultiplied);
+    pattern.fill(QColor(0,0,0));
+    QListWidgetItem* p = new QListWidgetItem(QString::number(0));
+    p->setData(Qt::UserRole, QVariant::fromValue<QImage>(pattern));
     animList->addItem(p);
-    lsa->patternEditor->getPatternAsImage();
-    lsa->setInstrument(currentInstrument());
-    editors->addWidget(lsa);
+    animList->setCurrentItem(p);
+}
+
+void MainWindow::on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    Q_UNUSED(previous);
+    patternEditor->init(qvariant_cast<QImage>(current->data(Qt::UserRole)));
 }

@@ -54,7 +54,8 @@ SOURCES += main.cpp\
     lightbuddypatternuploader.cpp \
     serialcommandqueue.cpp \
     lightbuddyprotocol.cpp \
-    colorchooser.cpp
+    colorchooser.cpp \
+    patterneditordelegate.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -74,7 +75,8 @@ HEADERS  += mainwindow.h \
     lightbuddypatternuploader.h \
     serialcommandqueue.h \
     lightbuddyprotocol.h \
-    colorchooser.h
+    colorchooser.h \
+    patterneditordelegate.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \

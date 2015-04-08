@@ -2,6 +2,7 @@
 #define PATTERNDITOR_H
 
 #include <QWidget>
+#include <QMetaType>
 
 class QUndoStack;
 class UndoCommand;
@@ -15,6 +16,7 @@ class PatternEditor : public QWidget
     Q_OBJECT
 public:
     explicit PatternEditor(QWidget *parent = 0);
+    virtual ~PatternEditor();
 
     /// Re-initialze the pattern editor as a blank image with the given size
     /// @param frameCount Number of frames in this pattern
@@ -58,6 +60,10 @@ public:
     void pushUndoCommand(UndoCommand *command);
     bool isPaint() const { return m_isPaint; }
     void setPaint(bool paint) { m_isPaint = paint; }
+
+    inline int frameCount() const { return pattern.width(); }
+    inline int stripLength() const { return pattern.height(); }
+
     AbstractInstrument* instrument() { return m_pi; }
 protected:
     void paintEvent(QPaintEvent *event);
@@ -88,12 +94,14 @@ private:
 signals:
     void changed(bool);
     void resized();
-    void updated(const QImage&);
+    void updated();
 public slots:
     void setToolColor(QColor color);
     void setToolSize(int size);
     void setPlaybackRow(int row);
     void setInstrument(AbstractInstrument*);
 };
+
+Q_DECLARE_METATYPE(PatternEditor*)
 
 #endif // PATTERNDITOR_H
