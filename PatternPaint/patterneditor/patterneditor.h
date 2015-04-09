@@ -22,7 +22,7 @@ public:
     /// @param frameCount Number of frames in this pattern
     /// @param stripLength Number of LEDs in this strip
     /// @param initTools - temporary parameter - set tools parameters like size and color to default
-    void init(int frameCount, int stripLength);
+    //void init(int frameCount, int stripLength);
 
     /// Initialize the pattern editor using a QImage as the new pattern
     /// @param newPattern New pattern to load
@@ -95,7 +95,6 @@ private:
     void updateToolPreview(int x, int y);
 signals:
     void changed(bool);
-    void resized();
     void updated();
 public slots:
     void setToolColor(QColor color);

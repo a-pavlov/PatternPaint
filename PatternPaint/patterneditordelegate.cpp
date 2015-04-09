@@ -15,7 +15,7 @@ void PatternEditorDelegate::paint(QPainter* painter, const QStyleOptionViewItem&
     painter->fillRect(QRect(option.rect.x(), option.rect.y(), scaled.width(), scaled.height()), QColor(0,0,0));
     painter->drawImage(option.rect.x(), option.rect.y(), scaled);
     if (index.data(Qt::UserRole + 2).toBool()) {
-        painter->drawImage(option.rect.x() + 2, option.rect.y() + 2, QImage(":/resources/images/modified.png"));
+        painter->drawImage(QRect(option.rect.x() + 2, option.rect.y() + 2, 16, 16), QImage(":/resources/images/modified.png"));
     }
 }
 

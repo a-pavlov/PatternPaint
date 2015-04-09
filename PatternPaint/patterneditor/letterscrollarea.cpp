@@ -5,7 +5,7 @@ LetterScrollArea::LetterScrollArea(QWidget *parent) : QScrollArea(parent) {
     setupUi(this);
     patternEditor->setToolSize(1);
     patternEditor->setToolColor(QColor(255,255,255));
-    patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
+    //patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
 }
 
 LetterScrollArea::~LetterScrollArea()

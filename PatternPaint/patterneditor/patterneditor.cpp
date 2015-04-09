@@ -9,8 +9,6 @@
 #include <QUndoStack>
 
 
-#define COLOR_CLEAR             QColor(0,0,0,0)
-#define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
 #define COLOR_GRID_LINES        QColor(30,30,30,200)
 #define COLOR_GRID_EDGES        QColor(30,30,30, 60)
 
@@ -21,6 +19,9 @@
 
 #define MIN_UPDATE_INTERVAL     15  // minimum interval between screen updates, in ms
 #define MIN_MOUSE_INTERVAL      5   // minimum interval between mouse inputs, in ms
+
+#define COLOR_CLEAR QColor(0,0,0,0)
+#define COLOR_CANVAS_DEFAULT QColor(0,0,0,0)
 
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
@@ -42,6 +43,7 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
     updateGridSize();
 }
 
+/*
 void PatternEditor::init(int frameCount, int stripLength)
 {
     qDebug() << Q_FUNC_INFO;
@@ -66,8 +68,10 @@ void PatternEditor::init(int frameCount, int stripLength)
 
     update();
 }
+*/
 
 bool PatternEditor::init(QImage newPattern, bool scaled) {
+    qDebug() << Q_FUNC_INFO;
     // TODO: Implement 'save' check before overwriting?
 
     // If the pattern doesn't fit, scale it.
@@ -76,17 +80,28 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
         newPattern = newPattern.scaledToHeight(pattern.height());
     }
 
+    this->setBaseSize(newPattern.width(), newPattern.height());
+    //pattern = QImage(newPattern.width(), newPattern.height(),
+    //                 QImage::Format_ARGB32_Premultiplied);
+    //pattern.fill(COLOR_CLEAR);
+
+    toolPreview = QImage(newPattern.width(), newPattern.height(),
+                         QImage::Format_ARGB32_Premultiplied);
+    toolPreview.fill(COLOR_CLEAR);
+
+    setMouseTracking(true);
+    updateGridSize();
+
     // Re-init the display using the new geometry
-    init(newPattern.width(), newPattern.height());
+    //init(newPattern.width(), newPattern.height());
 
     // Draw the new pattern to the display
-    QPainter painter(&pattern);
-    painter.drawImage(0,0,newPattern);
+    //QPainter painter(&pattern);
+    //painter.drawImage(0,0,newPattern);
+    pattern = newPattern;
 
     // and force a screen update
     update();
-
-    emit resized();
     return true;
 }
 

@@ -30,14 +30,26 @@
 // TODO: Move this to pattern uploader or something?
 #include "ColorSwirl_Sketch.h"
 
-//enum SlideShowRoles {
-//    ImageRole       = Qt::UserRole + 1,
-//    UndoStackRole   = Qt::UserRole + 2
-//};
-
 #define MIN_TIMER_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
 
 #define CONNECTION_SCANNER_INTERVAL 100
+
+#define COLOR_CLEAR             QColor(0,0,0,0)
+#define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
+
+/**
+ * @brief clearImage
+ * @param width - image width
+ * @param height - image height
+ * @return default pattern
+ */
+QImage clearImage(int width, int height) {
+    Q_ASSERT(width > 0);
+    Q_ASSERT(height > 0);
+    QImage img(width, height, QImage::Format_ARGB32_Premultiplied);
+    img.fill(COLOR_CANVAS_DEFAULT);
+    return img;
+}
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -101,7 +113,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     mode = Disconnected;
 
-    patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
+
+    //patternEditor->init(clearImage(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT));
 
     // Our pattern editor wants to get some notifications
     connect(m_colorChooser, SIGNAL(sendColor(QColor)),
@@ -161,7 +174,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     animList->setDragDropMode(QAbstractItemView::InternalMove);
     animList->setItemDelegate(new PatternEditorDelegate());
-    addNewAnimation(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
+    addNewAnimation(clearImage(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT));
     readSettings();
 }
 
@@ -238,16 +251,7 @@ void MainWindow::on_actionPlay_triggered()
 
 void MainWindow::on_actionLoad_File_triggered()
 {
-    while (patternEditor->isEdited()) {
-        int ans = warnUnsavedData();
-        if (ans == QMessageBox::Yes) {
-            on_actionSave_File_as_triggered();  // save file and check again
-        }
-
-        if (ans == QMessageBox::No) break;  // continue open file
-        if (ans == QMessageBox::Cancel) return; // interrupt opening
-    }
-
+    // check file already opened here!
     QSettings settings;
     QString lastDirectory = settings.value("File/LoadDirectory").toString();
 
@@ -275,7 +279,8 @@ void MainWindow::on_actionLoad_File_triggered()
         return;
     }
 
-    patternEditor->init(pattern);
+    addNewAnimation(pattern, fileName);
+    //patternEditor->init(pattern);
     patternEditor->setEdited(false);
 }
 
@@ -526,10 +531,7 @@ void MainWindow::on_actionResize_Pattern_triggered()
                  << resizer->ledCount();
 
         // Create a new pattern, filled with a black color
-        QImage newImage(resizer->length(),
-                            resizer->ledCount(),
-                            QImage::Format_RGB32);
-        newImage.fill(QColor(0,0,0,0));
+        QImage newImage(clearImage(resizer->length(), resizer->ledCount()));
 
         // Copy over whatever portion of the original pattern will fit
         QPainter painter(&newImage);
@@ -677,7 +679,7 @@ void MainWindow::on_actionNew_Animation_triggered()
         return;
     }
 
-    addNewAnimation(resizer->length(), resizer->ledCount());
+    addNewAnimation(clearImage(resizer->length(), resizer->ledCount()));
 }
 
 void MainWindow::on_actionOpen_Animation_triggered()
@@ -710,14 +712,11 @@ AbstractInstrument* MainWindow::currentInstrument() const {
     return p;
 }
 
-void MainWindow::addNewAnimation(int width, int height) {
-    Q_ASSERT(width > 0);
-    Q_ASSERT(height > 0);
-    QImage pattern(width, height, QImage::Format_ARGB32_Premultiplied);
-    pattern.fill(QColor(0,0,0));
+void MainWindow::addNewAnimation(const QImage& pattern, const QString& filename) {
     SlideShowItem* p = new SlideShowItem(QString::number(0));
     //p->setData(Qt::UserRole, QVariant::fromValue<QImage>(pattern));
     p->setImage(pattern);
+    p->setToolTip(filename.isEmpty()?"New animation":filename);
     m_undoStackGroup->addStack(p->stack());
     animList->addItem(p);
     animList->setCurrentItem(p);
@@ -730,7 +729,6 @@ void MainWindow::on_animList_currentItemChanged(QListWidgetItem *current, QListW
     Q_UNUSED(previous);
     SlideShowItem* p = dynamic_cast<SlideShowItem*>(current);
     Q_ASSERT(p != NULL);
-    //patternEditor->init(qvariant_cast<QImage>(current->data(Qt::UserRole)), false);
     patternEditor->init(p->getImage(), false);
     patternEditor->setUndoStack(p->stack());
     m_undoStackGroup->setActiveStack(p->stack());

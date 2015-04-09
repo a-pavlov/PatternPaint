@@ -136,10 +136,10 @@ private:
     /**
      * @brief addNewAnimation - add new item into list widget with animation icon and add new pattern editor into
      * stacked widget for editing
-     * @param width - frames count in animation
-     * @param height - leds count in animation
+     * @param pattern - new image pattern
+     * @param filename - source file name, can be empty
      */
-    void addNewAnimation(int width, int height);
+    void addNewAnimation(const QImage& pattern, const QString& filename = QString());
 };
 
 #endif // MAINWINDOW_H
