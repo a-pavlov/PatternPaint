@@ -96,6 +96,7 @@ private:
 signals:
     void changed(bool);
     void updated();
+    void resized();
 public slots:
     void setToolColor(QColor color);
     void setToolSize(int size);
