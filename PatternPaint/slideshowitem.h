@@ -10,7 +10,8 @@ class SlideShowItem : public QListWidgetItem
 public:
     enum Roles {
         PreviewImage = Qt::UserRole + 1,
-        Modified
+        Modified,
+        PatternSize
     };
 
     explicit SlideShowItem(QListWidget* parent = 0);
@@ -23,6 +24,7 @@ public:
 private:
     QUndoStack  ustack;
     QImage img;
+    QSize  psize;
     bool modified;
 signals:
 

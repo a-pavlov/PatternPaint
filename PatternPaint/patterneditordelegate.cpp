@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QPainter>
 
+#include "slideshowitem.h"
+
 PatternEditorDelegate::PatternEditorDelegate(QObject* parent) : QItemDelegate(parent) {
 }
 
@@ -9,7 +11,7 @@ PatternEditorDelegate::~PatternEditorDelegate() {
 }
 
 void PatternEditorDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const {
-    QImage img = qvariant_cast<QImage>(index.data(Qt::UserRole + 1));
+    QImage img = qvariant_cast<QImage>(index.data(SlideShowItem::PreviewImage));
     QImage scaled = img.scaledToWidth(200);
     QItemDelegate::paint(painter, option, index);
     painter->fillRect(QRect(option.rect.x(), option.rect.y(), scaled.width(), scaled.height()), QColor(0,0,0));
@@ -21,8 +23,12 @@ void PatternEditorDelegate::paint(QPainter* painter, const QStyleOptionViewItem&
 
 QSize PatternEditorDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index ) const {
     Q_UNUSED(option);
-    QImage img = qvariant_cast<QImage>(index.data(Qt::UserRole + 1));
-    QImage scaled = img.scaledToWidth(200);
-    return QSize(scaled.size().width(), scaled.size().height() + 5);
+    QSize size = qvariant_cast<QSize>(index.data(SlideShowItem::PatternSize));
+    float aspect = 200.0/size.width();
+
+    //QImage img = qvariant_cast<QImage>(index.data(SlideShowItem::PreviewImage));
+    //QImage scaled = img.scaledToWidth(200);
+    //return QSize(scaled.size().width(), scaled.size().height() + 5);
+    return QSize(200, size.height()*aspect + 5);
 }
 

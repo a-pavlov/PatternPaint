@@ -180,9 +180,12 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>202</width>
+          <width>205</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
         </property>
        </widget>
       </item>
