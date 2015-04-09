@@ -7,7 +7,6 @@
 #include "resizepattern.h"
 #include "undocommand.h"
 #include "colorchooser.h"
-#include "letterscrollarea.h"
 #include "patterneditordelegate.h"
 #include "slideshowitem.h"
 
