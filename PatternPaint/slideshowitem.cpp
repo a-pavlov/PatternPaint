@@ -1,10 +1,14 @@
 #include "slideshowitem.h"
 
-SlideShowItem::SlideShowItem(QListWidget* parent) : QListWidgetItem(parent, QListWidgetItem::UserType + 1) {
+SlideShowItem::SlideShowItem(QListWidget* parent) :
+    QListWidgetItem(parent, QListWidgetItem::UserType + 1), modified(false) {
         ustack.setUndoLimit(50);
 }
 
-SlideShowItem::SlideShowItem(const QString& text) : QListWidgetItem(text, 0, QListWidgetItem::UserType + 1) {}
+SlideShowItem::SlideShowItem(const QString& text) :
+    QListWidgetItem(text, 0, QListWidgetItem::UserType + 1), modified(false) {
+
+}
 
 QVariant SlideShowItem::data(int role) const {
     switch(role) {

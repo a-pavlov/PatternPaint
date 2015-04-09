@@ -250,7 +250,6 @@ void MainWindow::on_actionPlay_triggered()
 
 void MainWindow::on_actionLoad_File_triggered()
 {
-    // check file already opened here!
     QSettings settings;
     QString lastDirectory = settings.value("File/LoadDirectory").toString();
 
@@ -575,8 +574,15 @@ void MainWindow::readSettings()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     while (patternEditor->isEdited()) {
-        int ans = warnUnsavedData();
-        if (ans == QMessageBox::Yes) {
+        QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowModality(Qt::WindowModal);
+        msgBox.setText("The animation has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ans = msgBox.exec();
+        if (ans == QMessageBox::Save) {
             on_actionSave_File_as_triggered();
         }
 
@@ -585,7 +591,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
             return;
         }
 
-        if (ans == QMessageBox::No) break;
+        if (ans == QMessageBox::Discard) break;
     }
 
     writeSettings();
@@ -642,13 +648,6 @@ void MainWindow::on_patternUpdated() {
 
 void MainWindow::on_patternResized() {
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
-}
-
-int MainWindow::warnUnsavedData() {
-    return QMessageBox::warning(this, tr("Exit program"),
-                                tr("File has been modified.\nDo you want to save changes?"),
-                                QMessageBox::Yes | QMessageBox::Default,
-                                QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
 }
 
 bool MainWindow::saveFile(const QString& filename) {

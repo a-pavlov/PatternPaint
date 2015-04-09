@@ -124,7 +124,6 @@ private:
 
     void writeSettings();
     void readSettings();
-    int warnUnsavedData();
     bool saveFile(const QString& filename);
 
     /**
