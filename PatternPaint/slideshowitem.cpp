@@ -42,4 +42,5 @@ void SlideShowItem::setData(int role, const QVariant& value) {
 
 void SlideShowItem::setImage(const QImage& image) {
     img = image;
+    psize= img.size();
 }

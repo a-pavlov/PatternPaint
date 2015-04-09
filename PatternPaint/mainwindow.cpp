@@ -113,8 +113,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mode = Disconnected;
 
 
-    //patternEditor->init(clearImage(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT));
-
     // Our pattern editor wants to get some notifications
     connect(m_colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
@@ -432,6 +430,7 @@ void MainWindow::on_actionFlip_Horizontal_triggered()
     // TODO: This in a less hacky way?
     // TODO: Undo/redo
     QImage image =  patternEditor->getPatternAsImage();
+    patternEditor->pushUndoCommand();
     patternEditor->init(image.mirrored(true, false));
 }
 
@@ -440,6 +439,7 @@ void MainWindow::on_actionFlip_Vertical_triggered()
     // TODO: This in a less hacky way?
     // TODO: Undo/redo
     QImage image =  patternEditor->getPatternAsImage();
+    patternEditor->pushUndoCommand();
     patternEditor->init(image.mirrored(false, true));
 }
 
@@ -448,6 +448,7 @@ void MainWindow::on_actionClear_Pattern_triggered()
     // TODO: This in a less hacky way?
     // TODO: Undo/redo
     QImage image =  patternEditor->getPatternAsImage();
+    patternEditor->pushUndoCommand();
     image.fill(0);
     patternEditor->init(image);
 }
@@ -534,7 +535,7 @@ void MainWindow::on_actionResize_Pattern_triggered()
         // Copy over whatever portion of the original pattern will fit
         QPainter painter(&newImage);
         QImage originalImage = patternEditor->getPatternAsImage();
-        patternEditor->pushUndoCommand(new UndoCommand(originalImage, *(patternEditor)));
+        patternEditor->pushUndoCommand();
         painter.drawImage(0,0,originalImage);
         patternEditor->init(newImage, false);
     }
@@ -542,9 +543,6 @@ void MainWindow::on_actionResize_Pattern_triggered()
 
 void MainWindow::on_actionAddress_programmer_triggered()
 {
-//    int patternLength = patternEditor->getPatternAsImage().width();
-//    int ledCount = patternEditor->getPatternAsImage().height();
-
     // TODO: Dispose of this?
     AddressProgrammer* programmer = new AddressProgrammer(this);
     programmer->setWindowModality(Qt::WindowModal);
@@ -642,7 +640,6 @@ void MainWindow::on_patternChanged(bool changed) {
 void MainWindow::on_patternUpdated() {
     SlideShowItem* p = dynamic_cast<SlideShowItem*>(animList->currentItem());
     Q_ASSERT(p);
-    //p->setImage(patternEditor->getPatternAsImage());
     animList->currentItem()->setData(SlideShowItem::PreviewImage, patternEditor->getPatternAsImage());
 }
 

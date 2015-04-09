@@ -18,12 +18,6 @@ public:
     explicit PatternEditor(QWidget *parent = 0);
     virtual ~PatternEditor();
 
-    /// Re-initialze the pattern editor as a blank image with the given size
-    /// @param frameCount Number of frames in this pattern
-    /// @param stripLength Number of LEDs in this strip
-    /// @param initTools - temporary parameter - set tools parameters like size and color to default
-    //void init(int frameCount, int stripLength);
-
     /// Initialize the pattern editor using a QImage as the new pattern
     /// @param newPattern New pattern to load
     /// @param scaled If true, scale the image to match the height of the previous pattern
@@ -58,12 +52,18 @@ public:
 
     void leaveEvent(QEvent * event);
 
+    /**
+     * @brief pushUndoCommand
+     * @param command - manually generated command for undo
+     */
     void pushUndoCommand(UndoCommand *command);
+
+    /**
+     * @brief pushUndoCommand - self generated undo command
+     */
+    void pushUndoCommand();
     bool isPaint() const { return m_isPaint; }
     void setPaint(bool paint) { m_isPaint = paint; }
-
-    inline int frameCount() const { return pattern.width(); }
-    inline int stripLength() const { return pattern.height(); }
 
     AbstractInstrument* instrument() { return m_pi; }
     void update();

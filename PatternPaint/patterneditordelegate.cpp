@@ -25,10 +25,6 @@ QSize PatternEditorDelegate::sizeHint(const QStyleOptionViewItem & option, const
     Q_UNUSED(option);
     QSize size = qvariant_cast<QSize>(index.data(SlideShowItem::PatternSize));
     float aspect = 200.0/size.width();
-
-    //QImage img = qvariant_cast<QImage>(index.data(SlideShowItem::PreviewImage));
-    //QImage scaled = img.scaledToWidth(200);
-    //return QSize(scaled.size().width(), scaled.size().height() + 5);
     return QSize(200, size.height()*aspect + 5);
 }
 

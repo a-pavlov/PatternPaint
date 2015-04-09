@@ -43,37 +43,9 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
     updateGridSize();
 }
 
-/*
-void PatternEditor::init(int frameCount, int stripLength)
-{
-    qDebug() << Q_FUNC_INFO;
-    // Store the width and height, so that letterboxscrollarea can resize this widget properly
-    this->setBaseSize(frameCount, stripLength);
-
-    // Initialize the pattern to a blank canvass
-    pattern = QImage(frameCount,
-                     stripLength,
-                     QImage::Format_ARGB32_Premultiplied);
-    pattern.fill(COLOR_CANVAS_DEFAULT);
-
-    toolPreview = QImage(frameCount,
-                         stripLength,
-                         QImage::Format_ARGB32_Premultiplied);
-    toolPreview.fill(COLOR_CLEAR);
-
-    // Turn on mouse tracking so we can draw a preview
-    setMouseTracking(true);
-
-    updateGridSize();
-
-    update();
-}
-*/
-
 bool PatternEditor::init(QImage newPattern, bool scaled) {
     qDebug() << Q_FUNC_INFO;
     QSize oldSize = pattern.size();
-    // TODO: Implement 'save' check before overwriting?
 
     // If the pattern doesn't fit, scale it.
     // TODO: Display an import dialog to let the user decide what to do?
@@ -82,9 +54,6 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
     }
 
     this->setBaseSize(newPattern.width(), newPattern.height());
-    //pattern = QImage(newPattern.width(), newPattern.height(),
-    //                 QImage::Format_ARGB32_Premultiplied);
-    //pattern.fill(COLOR_CLEAR);
 
     toolPreview = QImage(newPattern.width(), newPattern.height(),
                          QImage::Format_ARGB32_Premultiplied);
@@ -93,12 +62,6 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
     setMouseTracking(true);
     updateGridSize();
 
-    // Re-init the display using the new geometry
-    //init(newPattern.width(), newPattern.height());
-
-    // Draw the new pattern to the display
-    //QPainter painter(&pattern);
-    //painter.drawImage(0,0,newPattern);
     pattern = newPattern;
 
     // and force a screen update
@@ -299,6 +262,10 @@ void PatternEditor::pushUndoCommand(UndoCommand *command)
     Q_ASSERT(m_undoStack != NULL);
     if (command) m_undoStack->push(command);
     setEdited(true);
+}
+
+void PatternEditor::pushUndoCommand() {
+    pushUndoCommand(new UndoCommand(pattern, *this));
 }
 
 void PatternEditor::update() {
