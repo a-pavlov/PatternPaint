@@ -33,10 +33,8 @@ public:
     QImage getPatternAsImage() const { return pattern; }
     QImage* getPattern() { return &pattern; }
 
-    bool isEdited() const { return m_edited; }
     void setEdited(bool e) {
-        m_edited = e;
-        emit changed(m_edited);
+        emit changed(e);
     }
 
     // for compatibility with EasyPaint sources

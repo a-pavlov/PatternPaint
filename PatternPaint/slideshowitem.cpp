@@ -46,3 +46,13 @@ void SlideShowItem::setImage(const QImage& image) {
     img = image;
     psize= img.size();
 }
+
+bool SlideShowItem::saveToFile(const QString& fileName) {
+    if (img.save(fileName)) {
+        filename = fileName;
+        setToolTip(filename);
+        return true;
+    }
+
+    return false;
+}

@@ -21,11 +21,16 @@ public:
     void setData(int role, const QVariant& value);
     void setImage(const QImage&);
     const QImage& getImage() const { return img; }
+    bool isModified() const { return modified; }
+    bool saveToFile(const QString& fileName);
+    QString fileName() const { return filename; }
+    void setFileName(const QString& fileName) { filename = fileName; }
 private:
     QUndoStack  ustack;
     QImage  img;
     QSize   psize;
     bool    modified;
+    QString filename;
 signals:
 
 public slots:

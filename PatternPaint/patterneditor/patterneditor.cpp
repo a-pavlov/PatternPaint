@@ -29,7 +29,6 @@ PatternEditor::PatternEditor(QWidget *parent) :
     m_undoStack = NULL;
     m_isPaint = false;
     m_pi = NULL;
-    m_edited = false;
 }
 
 PatternEditor::~PatternEditor() {

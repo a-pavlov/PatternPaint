@@ -18,6 +18,7 @@ class QUndoGroup;
 class ColorChooser;
 class QToolButton;
 class QSpinBox;
+class SlideShowItem;
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -99,6 +100,7 @@ private slots:
     void on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 
 private:
+
     static int animCounter;
     ColorChooser* m_colorChooser;
 
@@ -120,12 +122,11 @@ private:
     QUndoGroup *m_undoStackGroup;
     QAction* m_undoAction;
     QAction* m_redoAction;
-    QString  m_lastFile;
     QList<int>  m_freeIndexes;
 
     void writeSettings();
     void readSettings();
-    bool saveFile(const QString& filename);
+    QString askFilename();
 
     /**
      * @brief currentInstrument - get current instrument by enumeration all actions in instruments toolbar
@@ -140,6 +141,12 @@ private:
      * @param filename - source file name, can be empty
      */
     void addNewAnimation(const QImage& pattern, const QString& filename = QString());
+
+    /**
+     * @brief closeAnimation - ask save for modified animation,
+     * removes animations from animList
+     */
+    void closeAnimation(SlideShowItem*);
 };
 
 #endif // MAINWINDOW_H

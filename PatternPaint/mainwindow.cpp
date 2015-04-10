@@ -281,7 +281,35 @@ void MainWindow::on_actionLoad_File_triggered()
 }
 
 void MainWindow::on_actionSave_File_as_triggered() {
-    //TODO: Track if we already had an open file to enable this, add save as?
+    SlideShowItem* p = dynamic_cast<SlideShowItem*>(animList->currentItem());
+    Q_ASSERT(p);
+    QString toFilename = askFilename();
+    if (!toFilename.isEmpty()) {
+        if (p->saveToFile(toFilename)) {
+            p->setData(SlideShowItem::Modified, QVariant::fromValue(false));
+        } else {
+            QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
+                           .arg(toFilename));
+        }
+    }
+}
+
+void MainWindow::on_actionSave_File_triggered() {
+    SlideShowItem* p = dynamic_cast<SlideShowItem*>(animList->currentItem());
+    Q_ASSERT(p);
+    QString toFilename = p->fileName().isEmpty()?askFilename():p->fileName();
+    // TODO - fix copy paste
+    if (!toFilename.isEmpty()) {
+        if (p->saveToFile(toFilename)) {
+            p->setData(SlideShowItem::Modified, QVariant::fromValue(false));
+        } else {
+            QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
+                           .arg(toFilename));
+        }
+    }
+}
+
+QString MainWindow::askFilename() {
     QSettings settings;
     QString lastDirectory = settings.value("File/SaveDirectory").toString();
 
@@ -293,21 +321,13 @@ void MainWindow::on_actionSave_File_as_triggered() {
     QString fileName = QFileDialog::getSaveFileName(this,
         tr("Save Pattern"), "", tr("Pattern Files (*.png *.jpg *.bmp)"));
 
-    if(fileName.length() == 0) {
-        return;
+
+    if (!fileName.isEmpty()) {
+        QFileInfo lastFile(fileName);
+        settings.setValue("File/SaveDirectory", lastFile.absoluteFilePath());
     }
 
-    QFileInfo lastFile(fileName);
-    settings.setValue("File/SaveDirectory", lastFile.absoluteFilePath());
-    patternEditor->setEdited(!saveFile(fileName));
-}
-
-void MainWindow::on_actionSave_File_triggered() {
-    if (m_lastFile.isEmpty()) {
-        on_actionSave_File_as_triggered();
-    } else {
-        patternEditor->setEdited(!saveFile(m_lastFile));
-    }
+    return fileName;
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -570,26 +590,49 @@ void MainWindow::readSettings()
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
-{
-    while (patternEditor->isEdited()) {
-        QMessageBox msgBox(this);
-        msgBox.setIcon(QMessageBox::Question);
-        msgBox.setWindowModality(Qt::WindowModal);
-        msgBox.setText("The animation has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Save);
-        int ans = msgBox.exec();
-        if (ans == QMessageBox::Save) {
-            on_actionSave_File_as_triggered();
-        }
+{    
+    int completed;
+    while(completed != animList->count()) {
+        completed = 0;
+        for(int row = 0; row < animList->count(); ++row) {
+            SlideShowItem* p = dynamic_cast<SlideShowItem*>(animList->item(row));
+            Q_ASSERT(p);
+            if (p->isModified()) {
+                // ask
+                QMessageBox msgBox(this);
+                msgBox.setIcon(QMessageBox::Question);
+                msgBox.setWindowModality(Qt::WindowModal);
+                msgBox.setText(tr("The animation %1 has been modified.").arg(p->text()));
+                msgBox.setInformativeText("Do you want to save your changes?");
+                msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+                msgBox.setDefaultButton(QMessageBox::Save);
+                int ans = msgBox.exec();
+                if (ans == QMessageBox::Save) {
+                    QString toFilename = p->fileName().isEmpty()?askFilename():p->fileName();
+                    if (!toFilename.isEmpty()) {
+                        if (p->saveToFile(toFilename)) {
+                            p->setData(SlideShowItem::Modified, QVariant::fromValue(false));
+                            ++completed;
+                        } else {
+                            QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
+                                           .arg(toFilename));
+                        }
+                    } else {
+                        event->ignore();
+                        return;
+                    }
+                }
 
-        if (ans == QMessageBox::Cancel) {
-            event->ignore();
-            return;
-        }
+                if (ans == QMessageBox::Cancel) {
+                    event->ignore();
+                    return;
+                }
 
-        if (ans == QMessageBox::Discard) break;
+                if (ans == QMessageBox::Discard) {
+                    ++completed;
+                }
+            } else ++completed;
+        }
     }
 
     writeSettings();
@@ -647,18 +690,6 @@ void MainWindow::on_patternResized() {
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
 }
 
-bool MainWindow::saveFile(const QString& filename) {
-    Q_ASSERT(!filename.isEmpty());
-    if(!patternEditor->getPatternAsImage().save(filename)) {
-        QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
-                       .arg(filename));
-        return false;
-    }
-
-    m_lastFile = filename;
-    return true;
-}
-
 int MainWindow::animCounter = 0;
 
 void MainWindow::on_actionNew_Animation_triggered()
@@ -684,16 +715,42 @@ void MainWindow::on_actionOpen_Animation_triggered()
 
 void MainWindow::on_actionClose_animation_triggered()
 {
-    qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(animList->count() > 1);
+    Q_ASSERT(animList->count() > 1);    // we wont remove last animation from list
     SlideShowItem* p = dynamic_cast<SlideShowItem*>(animList->currentItem());
-    Q_ASSERT(p != NULL);
-    m_undoStackGroup->removeStack(p->stack());
-    patternEditor->setUndoStack(NULL);
-    int animIndex = p->text().toInt();
-    if (animIndex != -1) m_freeIndexes.push_back(animIndex);
-    delete p;
-    actionClose_animation->setEnabled(animList->count() > 1);
+    if (p->isModified()) {
+        // ask
+        QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowModality(Qt::WindowModal);
+        msgBox.setText(tr("The animation %1 has been modified.").arg(p->text()));
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ans = msgBox.exec();
+        if (ans == QMessageBox::Save) {
+            QString toFilename = p->fileName().isEmpty()?askFilename():p->fileName();
+            if (toFilename.isEmpty()) return;
+
+
+            if (p->saveToFile(toFilename)) {
+                p->setData(SlideShowItem::Modified, QVariant::fromValue(false));
+            } else {
+                QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
+                               .arg(toFilename));
+                return;
+            }
+
+        }
+
+        if (ans == QMessageBox::Cancel) {
+            return;
+        }
+
+        if (ans == QMessageBox::Discard) {
+        }
+    }
+
+    closeAnimation(p);
 }
 
 AbstractInstrument* MainWindow::currentInstrument() const {
@@ -711,24 +768,31 @@ AbstractInstrument* MainWindow::currentInstrument() const {
 
 void MainWindow::addNewAnimation(const QImage& pattern, const QString& filename) {
     SlideShowItem* p = new SlideShowItem(QString::number(0));
-    int animationIndex = -1;
-    if (filename.isEmpty()) {
-        if (!m_freeIndexes.isEmpty()) animationIndex = m_freeIndexes.takeFirst();
-                else animationIndex = ++animCounter;
-        p->setToolTip(tr("New animation %1").arg(animationIndex));
-    }
-    else {
-        p->setToolTip(filename);
-    }
+    int animationIndex = m_freeIndexes.isEmpty()?++animCounter:m_freeIndexes.takeFirst();
+    filename.isEmpty()?p->setToolTip(tr("New animation %1").arg(animationIndex)):
+                       p->setToolTip(filename);
 
     qDebug() << "anim index " << animationIndex;
 
+    p->setFileName(filename);
     p->setText(QString::number(animationIndex));
     //p->setData(Qt::UserRole, QVariant::fromValue<QImage>(pattern));
     p->setImage(pattern);
     m_undoStackGroup->addStack(p->stack());
     animList->addItem(p);
     animList->setCurrentItem(p);
+    actionClose_animation->setEnabled(animList->count() > 1);
+}
+
+void MainWindow::closeAnimation(SlideShowItem* p) {
+    qDebug() << Q_FUNC_INFO;
+    Q_ASSERT(p != NULL);
+
+    m_undoStackGroup->removeStack(p->stack());
+    patternEditor->setUndoStack(NULL);
+    int animIndex = p->text().toInt();
+    if (animIndex != -1) m_freeIndexes.push_back(animIndex);
+    delete p;
     actionClose_animation->setEnabled(animList->count() > 1);
 }
 
