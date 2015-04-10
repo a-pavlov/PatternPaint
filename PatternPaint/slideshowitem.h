@@ -23,9 +23,9 @@ public:
     const QImage& getImage() const { return img; }
 private:
     QUndoStack  ustack;
-    QImage img;
-    QSize  psize;
-    bool modified;
+    QImage  img;
+    QSize   psize;
+    bool    modified;
 signals:
 
 public slots:

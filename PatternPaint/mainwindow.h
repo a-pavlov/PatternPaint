@@ -99,7 +99,7 @@ private slots:
     void on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 
 private:
-    static int anim_counter;
+    static int animCounter;
     ColorChooser* m_colorChooser;
 
     QTimer* drawTimer;
@@ -121,6 +121,7 @@ private:
     QAction* m_undoAction;
     QAction* m_redoAction;
     QString  m_lastFile;
+    QList<int>  m_freeIndexes;
 
     void writeSettings();
     void readSettings();

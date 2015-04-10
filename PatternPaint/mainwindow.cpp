@@ -659,7 +659,7 @@ bool MainWindow::saveFile(const QString& filename) {
     return true;
 }
 
-int MainWindow::anim_counter = 0;
+int MainWindow::animCounter = 0;
 
 void MainWindow::on_actionNew_Animation_triggered()
 {
@@ -690,6 +690,8 @@ void MainWindow::on_actionClose_animation_triggered()
     Q_ASSERT(p != NULL);
     m_undoStackGroup->removeStack(p->stack());
     patternEditor->setUndoStack(NULL);
+    int animIndex = p->text().toInt();
+    if (animIndex != -1) m_freeIndexes.push_back(animIndex);
     delete p;
     actionClose_animation->setEnabled(animList->count() > 1);
 }
@@ -709,9 +711,21 @@ AbstractInstrument* MainWindow::currentInstrument() const {
 
 void MainWindow::addNewAnimation(const QImage& pattern, const QString& filename) {
     SlideShowItem* p = new SlideShowItem(QString::number(0));
+    int animationIndex = -1;
+    if (filename.isEmpty()) {
+        if (!m_freeIndexes.isEmpty()) animationIndex = m_freeIndexes.takeFirst();
+                else animationIndex = ++animCounter;
+        p->setToolTip(tr("New animation %1").arg(animationIndex));
+    }
+    else {
+        p->setToolTip(filename);
+    }
+
+    qDebug() << "anim index " << animationIndex;
+
+    p->setText(QString::number(animationIndex));
     //p->setData(Qt::UserRole, QVariant::fromValue<QImage>(pattern));
     p->setImage(pattern);
-    p->setToolTip(filename.isEmpty()?"New animation":filename);
     m_undoStackGroup->addStack(p->stack());
     animList->addItem(p);
     animList->setCurrentItem(p);
