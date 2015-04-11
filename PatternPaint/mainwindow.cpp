@@ -173,6 +173,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     animList->setItemDelegate(new PatternEditorDelegate());
     addNewAnimation(clearImage(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT));
     readSettings();
+    // temp code
+    connect(actionOpen_Animation, SIGNAL(triggered()), SLOT(on_actionLoad_File_triggered()));
 }
 
 MainWindow::~MainWindow(){}
